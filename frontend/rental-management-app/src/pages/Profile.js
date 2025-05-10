@@ -47,15 +47,16 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove token from localStorage
     localStorage.removeItem("role"); // Remove role from localStorage
     setUser(null); // Reset user state
   };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
