@@ -1,0 +1,21 @@
+# Backend
+backend/__pycache__/
+backend/venv/
+backend/*.pyc
+backend/*.pyo
+backend/.env
+
+# Frontend
+frontend/rental-management-app/node_modules/
+frontend/rental-management-app/build/
+frontend/rental-management-app/coverage/
+frontend/rental-management-app/.env.local
+frontend/rental-management-app/.env.development.local
+frontend/rental-management-app/.env.test.local
+frontend/rental-management-app/.env.production.local
+frontend/rental-management-app/npm-debug.log*
+frontend/rental-management-app/yarn-debug.log*
+frontend/rental-management-app/yarn-error.log*
+
+# System files
+.DS_Store
