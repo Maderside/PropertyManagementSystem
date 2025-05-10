@@ -1,6 +1,7 @@
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, create_engine
+import os
 # Database connection URL
-DATABASE_URL = "postgresql://postgres.ofafdftoqihnwfcxnkmf:Maderside3248@aws-0-eu-north-1.pooler.supabase.com:6543/postgres"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create the engine
 engine = create_engine(DATABASE_URL)
