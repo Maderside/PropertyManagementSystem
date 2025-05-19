@@ -78,19 +78,24 @@ const TransactionsList = () => {
         fetchTransactions();
     }, []);
 
+    // Get current user role from localStorage
+    const currentUserRole = localStorage.getItem('role');
+
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p><strong>Transactions:</strong></p>
-                <button
-                    style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                    onClick={() => {
-                        setShowAddTransactionForm(!showAddTransactionForm);
-                        setEditTransactionId(null); // Reset edit mode when adding a new transaction
-                    }}
-                >
-                    +
-                </button>
+                {currentUserRole === "landlord" && (
+                    <button
+                        style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                        onClick={() => {
+                            setShowAddTransactionForm(!showAddTransactionForm);
+                            setEditTransactionId(null); // Reset edit mode when adding a new transaction
+                        }}
+                    >
+                        +
+                    </button>
+                )}
             </div>
             {loading ? (
                 <p>Loading transactions...</p>

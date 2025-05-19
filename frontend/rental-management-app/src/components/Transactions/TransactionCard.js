@@ -53,6 +53,16 @@ const TransactionCard = ({ transaction, onClick, onDelete }) => {
     const cardColor = determineCardColor();
     const hoverColor = isHovered ? (cardColor === '#ffcccc' ? '#e6b3b3' : cardColor === '#ccffcc' ? '#b3e6b3' : '#e0e0e0') : cardColor;
 
+    // Determine if all resolutions are resolved
+    const allResolved = resolutions.every((res) => res.status === 'resolved');
+
+    // Get current user id and role from localStorage
+    const currentUserId = Number(localStorage.getItem('user_id'));
+    const currentUserRole = localStorage.getItem('role');
+
+    // Find the current user's resolution
+    const currentUserResolution = resolutions.find((res) => res.user_id === currentUserId);
+
     const handleConfirmTransaction = async () => {
         try {
             const response = await axios.put(`http://localhost:8000/resolve-transaction/${transaction.id}`, {}, {
@@ -60,7 +70,6 @@ const TransactionCard = ({ transaction, onClick, onDelete }) => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             });
-            console.log(response);
             alert(response.data.message || 'Transaction confirmed successfully!');
             setForceUpdate((prev) => !prev); // Force update the component to re-fetch resolutions
         } catch (error) {
@@ -117,26 +126,30 @@ const TransactionCard = ({ transaction, onClick, onDelete }) => {
                     </li>
                 ))}
             </ul>
-            <button
-                style={styles.confirmButton}
-                onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the card's onClick
-                    handleConfirmTransaction();
-                }}
-            >
-                Confirm transaction
-            </button>
-            <button
-                style={styles.deleteButton}
-                onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the card's onClick
-                    if (onDelete) {
-                        onDelete(transaction.id);
-                    }
-                }}
-            >
-                X
-            </button>
+            {currentUserResolution && (
+                <button
+                    style={styles.confirmButton}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card's onClick
+                        handleConfirmTransaction();
+                    }}
+                >
+                    {allResolved ? "Cancel confirmation" : "Confirm transaction"}
+                </button>
+            )}
+            {currentUserRole === "landlord" && (
+                <button
+                    style={styles.deleteButton}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card's onClick
+                        if (onDelete) {
+                            onDelete(transaction.id);
+                        }
+                    }}
+                >
+                    X
+                </button>
+            )}
         </div>
     );
 };

@@ -6,20 +6,25 @@ const TenantCard = ({ name, email, onClick, onRemove }) => {
         { label: 'Email', value: email },
     ];
 
+    // Get current user role from localStorage
+    const currentUserRole = localStorage.getItem('role');
+
     return (
         <div style={styles.container}>
             <Card title={"👤 "+name} content={content} onClick={onClick} />
-            <button
-                style={styles.removeButton}
-                onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the card's onClick
-                    if (onRemove) {
-                        onRemove();
-                    }
-                }}
-            >
-                X
-            </button>
+            {currentUserRole === "landlord" && (
+                <button
+                    style={styles.removeButton}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card's onClick
+                        if (onRemove) {
+                            onRemove();
+                        }
+                    }}
+                >
+                    X
+                </button>
+            )}
         </div>
     );
 };

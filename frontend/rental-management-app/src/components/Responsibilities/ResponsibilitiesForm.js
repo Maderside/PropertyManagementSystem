@@ -111,7 +111,7 @@ const ResponsibilitiesForm = ({ propertyId, responsibilityId, mode, onResponsibi
             }
         } catch (error) {
             console.error('Error submitting responsibility:', error);
-            alert('Failed to submit responsibility. Please try again.');
+            alert(error.response?.data?.detail || 'Failed to submit responsibility. Please try again.');
         }
     };
 

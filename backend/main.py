@@ -783,7 +783,7 @@ async def resolve_transaction(
     if not resolution:
         raise HTTPException(status_code=404, detail="Resolution not found for this transaction and user")
 
-    # Update the resolution status to "resolved" if it is currently "pending"
+    # Toggle the resolution status between "pending" and "resolved"
     if resolution.status == "pending":
         resolution.status = "resolved"
         resolution.resolved_at = datetime.now()
@@ -792,5 +792,52 @@ async def resolve_transaction(
         session.refresh(resolution)
         return {"message": "Transaction resolution updated to resolved", "resolution_id": resolution.id}
     else:
-        return {"message": "Transaction resolution is already resolved", "resolution_id": resolution.id}
+        resolution.status = "pending"
+        resolution.resolved_at = None
+        session.add(resolution)
+        session.commit()
+        session.refresh(resolution)
+        return {"message": "Transaction resolution updated to pending", "resolution_id": resolution.id}
+
+@app.put("/resolve-tenant-request/{request_id}")
+async def resolve_tenant_request(
+    request_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    # Ensure the current user is authenticated
+    if not current_user:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+
+    # Check if the tenant request exists
+    from models import TenantRequest, RequestResolution  # Ensure import if not already
+    request_statement = select(TenantRequest).where(TenantRequest.id == request_id)
+    tenant_request = session.exec(request_statement).first()
+    if not tenant_request:
+        raise HTTPException(status_code=404, detail="Tenant request not found")
+
+    # Find the resolution for the current user and request
+    resolution_statement = select(RequestResolution).where(
+        RequestResolution.request_id == request_id,
+        RequestResolution.user_id == current_user.id
+    )
+    resolution = session.exec(resolution_statement).first()
+    if not resolution:
+        raise HTTPException(status_code=404, detail="Resolution not found for this request and user")
+
+    # Toggle the resolution status between "pending" and "resolved"
+    if resolution.status == "pending":
+        resolution.status = "resolved"
+        resolution.resolved_at = datetime.now()
+        session.add(resolution)
+        session.commit()
+        session.refresh(resolution)
+        return {"message": "Request resolution updated to resolved", "resolution_id": resolution.id}
+    else:
+        resolution.status = "pending"
+        resolution.resolved_at = None
+        session.add(resolution)
+        session.commit()
+        session.refresh(resolution)
+        return {"message": "Request resolution updated to pending", "resolution_id": resolution.id}
 

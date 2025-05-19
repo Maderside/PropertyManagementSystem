@@ -59,6 +59,8 @@ const TenantList = () => {
 
     const propertyId = window.location.pathname.split('/').pop(); // Get the property ID from the URL
     
+    // Get current user role from localStorage
+    const currentUserRole = localStorage.getItem('role');
 
 
     useEffect(() => {
@@ -95,14 +97,16 @@ const TenantList = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p><strong>Tenants:</strong></p>
-                <button
-                    style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                    onClick={() => setShowAddTenantForm(!showAddTenantForm)}
-                >
-                     + 
-                </button>
+                {currentUserRole === "landlord" && (
+                    <button
+                        style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                        onClick={() => setShowAddTenantForm(!showAddTenantForm)}
+                    >
+                        + 
+                    </button>
+                )}
             </div>
-            {showAddTenantForm && (
+            {showAddTenantForm && currentUserRole === "landlord" && (
                 <div style={{ marginTop: '10px' }}>
                     <input
                         type="email"

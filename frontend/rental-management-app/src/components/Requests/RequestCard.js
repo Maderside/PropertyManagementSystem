@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const RequestCard = ({ request, onClick }) => {
     const [isHovered, setIsHovered] = React.useState(false);
     const [resolutions, setResolutions] = useState([]);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
+    const [forceUpdate, setForceUpdate] = useState(false);
 
     // Fetch request resolutions
     useEffect(() => {
@@ -20,12 +22,12 @@ const RequestCard = ({ request, onClick }) => {
             } catch (error) {
                 console.error('Error fetching resolutions:', error);
             } finally {
-                setLoading(false); // Set loading to false after fetch completes
+                setLoading(false);
             }
         };
 
         fetchResolutions();
-    }, [request.id]);
+    }, [request.id, forceUpdate]);
 
     // Determine card background color
     const determineCardColor = () => {
@@ -36,6 +38,30 @@ const RequestCard = ({ request, onClick }) => {
 
     const cardColor = determineCardColor();
     const hoverColor = isHovered ? (cardColor === '#ccffcc' ? '#b3e6b3' : '#e0e0e0') : cardColor;
+
+    // Determine if all resolutions are resolved
+    const allResolved = resolutions.every((res) => res.status === 'resolved');
+
+    // Get current user id from localStorage
+    const currentUserId = Number(localStorage.getItem('user_id'));
+
+    // Find the current user's resolution
+    const currentUserResolution = resolutions.find((res) => res.user_id === currentUserId);
+
+    const handleConfirmRequest = async () => {
+        try {
+            const response = await axios.put(`http://localhost:8000/resolve-tenant-request/${request.id}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            alert(response.data.message || 'Request confirmed successfully!');
+            setForceUpdate((prev) => !prev);
+        } catch (error) {
+            console.error('Error confirming transaction:', error);
+            alert(error.response?.data?.detail || 'Failed to confirm transaction. Please try again.');
+        }
+    };
 
     if (loading) {
         return <div>Loading...</div>; // Show a loading indicator while fetching data
@@ -74,6 +100,17 @@ const RequestCard = ({ request, onClick }) => {
                     </li>
                 ))}
             </ul>
+            {currentUserResolution && (
+                <button
+                    style={styles.confirmButton}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleConfirmRequest();
+                    }}
+                >
+                    {allResolved ? "Cancel resolvement" : "Resolve request"}
+                </button>
+            )}
         </div>
     );
 };
@@ -114,6 +151,15 @@ const styles = {
         margin: '4px 0',
         display: 'flex',
         alignItems: 'center',
+    },
+    confirmButton: {
+        backgroundColor: 'yellow',
+        color: 'black',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        marginTop: '8px',
     },
 };
 

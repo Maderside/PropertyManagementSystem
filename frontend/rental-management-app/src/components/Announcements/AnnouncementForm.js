@@ -104,7 +104,7 @@ const AnnouncementForm = ({ propertyId, announcementId, mode, onAnnouncementAdde
             }
         } catch (error) {
             console.error('Error submitting announcement:', error);
-            alert('Failed to submit announcement. Please try again.');
+            alert(error.response?.data?.detail || 'Failed to submit announcement. Please try again.');
         }
     };
 

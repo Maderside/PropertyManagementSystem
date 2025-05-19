@@ -38,7 +38,8 @@ const Profile = () => {
       });
 
       setUser(response.data); // Set user data if request is successful
-      localStorage.setItem("role", response.data.role); // Store role in localStorage
+      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("user_id", response.data.id); // Store role in localStorage
     } catch (error) {
           console.error("Error fetching user:", error);
           setUser(null); // Clear user data if request fails

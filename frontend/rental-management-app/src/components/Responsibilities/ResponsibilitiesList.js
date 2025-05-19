@@ -12,7 +12,8 @@ const ResponsibilitiesList = () => {
 
     const propertyId = window.location.pathname.split('/').pop(); // Get the property ID from the URL
 
-
+    // Get current user role from localStorage
+    const currentUserRole = localStorage.getItem('role');
 
     const handleResponsibilityAdded = (newResponsibility) => {
         setResponsibilities((prev) => [...prev, newResponsibility]);
@@ -75,15 +76,17 @@ const ResponsibilitiesList = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p><strong>Responsibilities:</strong></p>
-                <button
-                    style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                    onClick={() => {
-                        setShowAddForm(!showAddForm);
-                        setEditResponsibilityId(null);
-                    }}
-                >
-                    +
-                </button>
+                {currentUserRole === "landlord" && (
+                    <button
+                        style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1.2rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                        onClick={() => {
+                            setShowAddForm(!showAddForm);
+                            setEditResponsibilityId(null);
+                        }}
+                    >
+                        +
+                    </button>
+                )}
             </div>
             {showAddForm ? (
                 <ResponsibilitiesForm
@@ -112,26 +115,30 @@ const ResponsibilitiesList = () => {
                             { label: 'Due Date', value: responsibility.due_date || 'N/A' },
                         ]}
                         onClick={() => setEditResponsibilityId(responsibility.id)}
-                        actions={[
-                            {
-                                label: 'X',
-                                onClick: (e) => {
-                                    e.stopPropagation(); // Prevent triggering the card's onClick
-                                    handleDeleteResponsibility(responsibility.id);
-                                },
-                                style: {
-                                    position: 'absolute',
-                                    top: '10px',
-                                    right: '10px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '8px 12px',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                },
-                            },
-                        ]}
+                        actions={
+                            currentUserRole === "landlord"
+                                ? [
+                                    {
+                                        label: 'X',
+                                        onClick: (e) => {
+                                            e.stopPropagation(); // Prevent triggering the card's onClick
+                                            handleDeleteResponsibility(responsibility.id);
+                                        },
+                                        style: {
+                                            position: 'absolute',
+                                            top: '10px',
+                                            right: '10px',
+                                            backgroundColor: 'red',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                        },
+                                    },
+                                ]
+                                : []
+                        }
                         tooltip="Click to edit"
                     />
                 ))
