@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.navbar-link {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.navbar-link:hover {
+  color: #6ec1e4;
+}
+.navbar-link.active, .navbar-link[aria-current="page"] {
+  color: #1de9b6;
+}

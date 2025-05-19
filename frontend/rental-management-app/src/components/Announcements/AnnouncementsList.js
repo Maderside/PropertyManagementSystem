@@ -65,7 +65,11 @@ const AnnouncementsList = () => {
             } catch (err) {
                 if (err.response?.status === 401) {
                     setError('Unauthorized access. Please log in again.');
-                } else {
+                }
+                if (err.response?.status === 404) {
+                    setError('Announcements not found');
+                }
+                else {
                     setError(err.message);
                 }
             } finally {

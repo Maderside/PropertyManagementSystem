@@ -17,9 +17,9 @@ const ManagementTabs = () => {
       case 'Payments':
         return <TransactionsList />;
       case 'Announcements':
-        return <AnnouncementsList />; // Placeholder for Announcements
+        return <AnnouncementsList />;
       case 'Tenant requests':
-        return <RequestsList/>; // Placeholder for Tenant Requests
+        return <RequestsList/>; 
       default:
         return null;
     }

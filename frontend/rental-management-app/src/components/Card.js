@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Card = ({ title, content, onClick, actions = [] }) => {
+const Card = ({ title, content, onClick, actions = [], tooltip }) => {
     const [isHovered, setIsHovered] = React.useState(false);
 
     return (
@@ -10,6 +10,7 @@ const Card = ({ title, content, onClick, actions = [] }) => {
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            title={tooltip} // use browser tooltip
         >
             <h2 style={styles.title}>{title}</h2>
             {content.map((item, index) => (
@@ -27,7 +28,6 @@ const Card = ({ title, content, onClick, actions = [] }) => {
                     {action.label}
                 </button>
             ))}
-            
         </div>
     );
 };
@@ -48,6 +48,7 @@ Card.propTypes = {
             style: PropTypes.object,
         })
     ),
+    tooltip: PropTypes.string,
 };
 
 const styles = {
@@ -57,7 +58,7 @@ const styles = {
         padding: '16px',
         margin: '16px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
+        cursor: 'default',
         transition: 'background-color 0.3s ease',
         backgroundColor: '#fff',
         position: 'relative',
@@ -73,6 +74,21 @@ const styles = {
     content: {
         margin: '4px 0',
         color: '#555',
+    },
+    tooltip: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        background: 'rgba(40,40,40,0.95)',
+        color: '#fff',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        fontSize: '0.95rem',
+        pointerEvents: 'none',
+        zIndex: 10,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        maxWidth: '220px',
+        whiteSpace: 'pre-line',
     },
 };
 

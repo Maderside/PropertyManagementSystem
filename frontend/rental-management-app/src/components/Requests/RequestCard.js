@@ -47,6 +47,7 @@ const RequestCard = ({ request, onClick }) => {
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            title="Click to edit" // use browser tooltip
         >
             <h2 style={styles.title}>{request.title}</h2>
             <p style={styles.content}>
@@ -93,7 +94,7 @@ const styles = {
         padding: '16px',
         margin: '16px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
+        cursor: 'default',
         transition: 'background-color 0.3s ease',
     },
     title: {

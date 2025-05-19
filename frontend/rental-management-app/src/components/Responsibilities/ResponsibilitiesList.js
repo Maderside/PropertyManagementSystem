@@ -57,7 +57,11 @@ const ResponsibilitiesList = () => {
             } catch (err) {
                 if (err.response?.status === 401) {
                     setError('Unauthorized access. Please log in again.');
-                } else {
+                }
+                if (err.response?.status === 404) {
+                    setError('Responsibilities not found');
+                }
+                 else {
                     setError(err.message);
                 }
             } finally {
@@ -128,6 +132,7 @@ const ResponsibilitiesList = () => {
                                 },
                             },
                         ]}
+                        tooltip="Click to edit"
                     />
                 ))
             )}

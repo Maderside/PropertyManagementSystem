@@ -26,10 +26,11 @@ const AnnouncementCard = ({ announcement, onClick, onDelete }) => {
                         border: 'none',
                         padding: '8px 12px',
                         borderRadius: '4px',
-                        cursor: 'pointer',
+                        cursor: 'default',
                     },
                 },
             ]}
+            tooltip="Click to edit"
         />
     );
 };

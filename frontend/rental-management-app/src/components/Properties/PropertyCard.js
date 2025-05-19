@@ -9,7 +9,7 @@ const PropertyCard = ({ name, location, description, onClick, onDelete }) => {
 
     return (
         <div style={styles.container}>
-            <Card title={name} content={content} onClick={onClick} />
+            <Card title={name} content={content} onClick={onClick} tooltip="Click to choose the property" />
             <button
                 style={styles.deleteButton}
                 onClick={(e) => {

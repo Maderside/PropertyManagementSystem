@@ -145,6 +145,37 @@ async def get_transactions(property_id: int, session: Session = Depends(get_sess
         raise HTTPException(status_code=404, detail="Transactions not found")
     return transactions
 
+@app.get("/all-resolved-transactions", response_model=List[Transaction])
+async def get_all_transactions(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    # Ensure the current user is a landlord
+    if current_user.role != "landlord":
+        raise HTTPException(status_code=403, detail="Only landlords can view all transactions for their properties")
+
+    # Get all properties owned by the landlord
+    property_statement = select(RentalProperty.id).where(RentalProperty.landlord_id == current_user.id)
+    property_ids = session.exec(property_statement).all()
+    if not property_ids:
+        return []
+
+    # Get all transactions for these properties
+    transaction_statement = select(Transaction).where(Transaction.property_id.in_(property_ids))
+    transactions = session.exec(transaction_statement).all()
+
+    # Filter transactions: only those where all resolutions are "resolved"
+    resolved_transactions = []
+    for transaction in transactions:
+        resolutions = session.exec(
+            select(TransactionResolution.status).where(TransactionResolution.transaction_id == transaction.id)
+        ).all()
+        if resolutions and all(status == "resolved" for status in resolutions):
+            resolved_transactions.append(transaction)
+        # If there are no resolutions, do not include the transaction
+
+    return resolved_transactions
+
 @app.post("/add-transaction/{property_id}", response_model=Transaction)
 async def create_transaction(
     property_id: int,

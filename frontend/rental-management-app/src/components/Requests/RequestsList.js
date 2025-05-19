@@ -26,7 +26,11 @@ const RequestsList = () => {
             } catch (err) {
                 if (err.response?.status === 401) {
                     setError('Unauthorized access. Please log in again.');
-                } else {
+                }
+                if (err.response?.status === 404) {
+                    setError('No requests found for this property.');
+                }
+                 else {
                     setError(err.message);
                 }
             } finally {
@@ -41,7 +45,7 @@ const RequestsList = () => {
         return <p>Loading requests...</p>;
     }
 
-    if (error) {
+    if (error && error !== 'No requests found for this property.') {
         return <p>Error: {error}</p>;
     }
 

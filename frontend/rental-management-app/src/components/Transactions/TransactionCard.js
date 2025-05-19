@@ -79,6 +79,7 @@ const TransactionCard = ({ transaction, onClick, onDelete }) => {
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            title='Click to edit'
         >
             <h2 style={styles.title}>{transaction.type}</h2>
             <p style={styles.content}>
@@ -160,7 +161,7 @@ const styles = {
         padding: '16px',
         margin: '16px',
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        cursor: 'pointer',
+        cursor: 'default',
         transition: 'background-color 0.3s ease',
     },
     cardHover: {

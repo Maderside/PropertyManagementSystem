@@ -70,8 +70,8 @@ const PropertyList = () => {
     }
 
     return (
-        <div className="property-list">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ paddingLeft: '1rem', paddingRight: '1rem',}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
                 <h2>Properties</h2>
                 <button
                     style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}

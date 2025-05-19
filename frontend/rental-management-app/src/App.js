@@ -1,37 +1,30 @@
-// import logo from './logo.svg';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import PropertyPanel from "./pages/PropertyPanel";
 import StatisticsPanel from './pages/StatisticsPanel';
+import Navbar from "./components/Navbar";
 
 function App() {
-
   return (
     <div className="App">
-      <header className="App-header">
-        {/* <img src={logo} className="App-logo" alt="logo" /> */}
-        <Router>
-          <nav>
-            <Link to="/">Home</Link>
-            | 
-            <Link to="/Profile">Profile</Link>
-            |
-            <Link to="/StatisticsPanel/1">Statistics</Link>
-          </nav>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/NotFound" element={<NotFound />} />
-            <Route path="/Profile" element={<Profile />} />
-            <Route path="/PropertyPanel/:propertyId" element={<PropertyPanel />} />
-            <Route path="/StatisticsPanel/:propertyId" element={<StatisticsPanel />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
-      </header>
-      
+      <Router>
+        <Navbar>
+          <NavLink to="/" className="navbar-link" end>Home</NavLink>
+          <NavLink to="/Profile" className="navbar-link">Profile</NavLink>
+          <NavLink to="/StatisticsPanel" className="navbar-link">Statistics Panel</NavLink>
+        </Navbar>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/NotFound" element={<NotFound />} />
+          <Route path="/Profile" element={<Profile />} />
+          <Route path="/PropertyPanel/:propertyId" element={<PropertyPanel />} />
+          <Route path="/StatisticsPanel" element={<StatisticsPanel />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
