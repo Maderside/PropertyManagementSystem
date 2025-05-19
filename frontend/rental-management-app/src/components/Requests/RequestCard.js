@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
-const RequestCard = ({ request, onClick }) => {
+const RequestCard = ({ request, onClick, onDelete }) => {
     const [isHovered, setIsHovered] = React.useState(false);
     const [resolutions, setResolutions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [forceUpdate, setForceUpdate] = useState(false);
+
+    // Get current user id and role from localStorage
+    const currentUserId = Number(localStorage.getItem('user_id'));
+    const currentUserRole = localStorage.getItem('role');
 
     // Fetch request resolutions
     useEffect(() => {
@@ -41,9 +45,6 @@ const RequestCard = ({ request, onClick }) => {
 
     // Determine if all resolutions are resolved
     const allResolved = resolutions.every((res) => res.status === 'resolved');
-
-    // Get current user id from localStorage
-    const currentUserId = Number(localStorage.getItem('user_id'));
 
     // Find the current user's resolution
     const currentUserResolution = resolutions.find((res) => res.user_id === currentUserId);
@@ -111,6 +112,19 @@ const RequestCard = ({ request, onClick }) => {
                     {allResolved ? "Cancel resolvement" : "Resolve request"}
                 </button>
             )}
+            {currentUserRole === "tenant" && (
+                <button
+                    style={styles.deleteButton}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (onDelete) {
+                            onDelete(request.id);
+                        }
+                    }}
+                >
+                    X
+                </button>
+            )}
         </div>
     );
 };
@@ -122,6 +136,7 @@ RequestCard.propTypes = {
         request_date: PropTypes.string.isRequired,
     }).isRequired,
     onClick: PropTypes.func,
+    onDelete: PropTypes.func, // Add onDelete prop
 };
 
 const styles = {
@@ -133,9 +148,11 @@ const styles = {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         cursor: 'default',
         transition: 'background-color 0.3s ease',
+        position: 'relative', // <-- Add this line
     },
     title: {
         margin: '0 0 8px',
+        marginTop: '25px',
         fontSize: '1.5rem',
         color: '#333',
     },
@@ -160,6 +177,17 @@ const styles = {
         borderRadius: '4px',
         cursor: 'pointer',
         marginTop: '8px',
+    },
+    deleteButton: {
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        backgroundColor: 'red',
+        color: 'white',
+        border: 'none',
+        padding: '8px 12px',
+        borderRadius: '4px',
+        cursor: 'pointer',
     },
 };
 
