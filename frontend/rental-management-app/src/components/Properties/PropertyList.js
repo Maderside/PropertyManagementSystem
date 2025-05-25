@@ -9,6 +9,7 @@ const PropertyList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showAddPropertyForm, setShowAddPropertyForm] = useState(false); // State to toggle form visibility
+    const [userRole, setUserRole] = useState(localStorage.getItem('role')); // Get user role from localStorage
     const navigate = useNavigate();
 
     const handlePropertyClick = (property) => {
@@ -21,20 +22,35 @@ const PropertyList = () => {
     };
 
     const handleDeleteProperty = async (propertyId) => {
-        const confirmDeletion = window.confirm('Are you sure you want to delete this property?');
+        const confirmDeletion = window.confirm(
+            userRole === "tenant"
+                ? "Are you sure you want to leave this property?"
+                : "Are you sure you want to delete this property?"
+        );
         if (!confirmDeletion) return;
 
         try {
-            await axios.delete(`http://localhost:8000/delete-property/${propertyId}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            alert('Property deleted successfully!');
+            if (userRole === "tenant") {
+                // Tenant leaves the property
+                await axios.delete(`http://localhost:8000/leave-property/${propertyId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                alert("You have successfully left the property!");
+            } else {
+                // Landlord deletes the property
+                await axios.delete(`http://localhost:8000/delete-property/${propertyId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                alert("Property deleted successfully!");
+            }
             setProperties((prevProperties) => prevProperties.filter((property) => property.id !== propertyId));
         } catch (error) {
-            console.error('Error deleting property:', error);
-            alert(error.response?.data?.detail || 'Failed to delete property. Please try again.');
+            console.error('Error:', error);
+            alert(error.response?.data?.detail || 'Failed to process the request. Please try again.');
         }
     };
 
@@ -73,12 +89,14 @@ const PropertyList = () => {
         <div style={{ paddingLeft: '1rem', paddingRight: '1rem',}}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
                 <h2>Properties</h2>
-                <button
-                    style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
-                    onClick={() => setShowAddPropertyForm(!showAddPropertyForm)}
-                >
-                    {showAddPropertyForm ? 'Cancel' : 'Add Property'}
-                </button>
+                {userRole !== "tenant" && ( // Hide button for tenants
+                    <button
+                        style={{ backgroundColor: 'green', color: 'white', padding: '10px 20px', fontSize: '1rem', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                        onClick={() => setShowAddPropertyForm(!showAddPropertyForm)}
+                    >
+                        {showAddPropertyForm ? 'Cancel' : 'Add Property'}
+                    </button>
+                )}
             </div>
             {showAddPropertyForm && <PropertyForm onPropertyAdded={handlePropertyAdded} />}
             {properties.map((property) => (

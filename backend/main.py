@@ -2,11 +2,13 @@ from fastapi import FastAPI, HTTPException, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, create_engine, select
 from typing import List
-from models import RentalProperty, User, Tenancy, Responsibility, Announcement, Transaction, TransactionResolution, TenantRequest, RequestResolution  # Import the models from models.py
+from models import RentalProperty, User, Tenancy, Responsibility, Announcement, Transaction, TransactionResolution, TenantRequest, RequestResolution, UserResponse  # Import the models from models.py
 from database import get_session, engine  # Import the session dependency from database.py
 from fastapi import FastAPI, Depends
 from auth import authenticate_user, create_access_token, get_current_user, hash_password, Token, OAuth2PasswordRequestForm
 from datetime import datetime
+from random import choices
+import string
 
 
 # Create the FastAPI app
@@ -80,7 +82,7 @@ async def get_tenants_for_property(property_id: int, session: Session = Depends(
 
 
 
-@app.post("/register", response_model=User)
+@app.post("/register", response_model=UserResponse)
 async def register_user(user: User, session: Session = Depends(get_session)):
     # Check if the email is already registered
     statement = select(User).where(User.email == user.email)
@@ -96,7 +98,7 @@ async def register_user(user: User, session: Session = Depends(get_session)):
     session.commit()
     session.refresh(user)
 
-    return user
+    return user  # Return the user object, which will be serialized as UserResponse
 
 @app.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_session)):
@@ -106,7 +108,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Sessi
     access_token = create_access_token(data={"email": form_data.username, "role": user.role})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/users/me")
+@app.get("/users/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     if not current_user:
         raise HTTPException(status_code=401, detail="User not authenticated")
@@ -416,10 +418,10 @@ async def get_request_resolutions(request_id: int, session: Session = Depends(ge
     ]
     return response
 
-@app.post("/add-tenant-to-property/{property_id}/{tenant_email}", response_model=User)
+@app.post("/add-tenant-to-property/{property_id}/{invite_code}", response_model=User)
 async def add_tenant_to_property(
     property_id: int,
-    tenant_email: str,
+    invite_code: str,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):  
@@ -436,11 +438,11 @@ async def add_tenant_to_property(
     if not property:
         raise HTTPException(status_code=404, detail="Property not found or does not belong to you")
 
-    # Find the tenant by email
-    tenant_statement = select(User).where(User.email == tenant_email, User.role == "tenant")
+    # Find the tenant by invite_code
+    tenant_statement = select(User).where(User.invite_code == invite_code, User.role == "tenant")
     tenant = session.exec(tenant_statement).first()
     if not tenant:
-        raise HTTPException(status_code=404, detail="Tenant with the given email not found")
+        raise HTTPException(status_code=404, detail="Tenant with the given invite code not found or invalid role")
 
     # Check if the tenant is already associated with the property
     tenancy_statement = select(Tenancy).where(
@@ -990,4 +992,48 @@ async def remove_request_resolution(
     session.commit()
 
     return {"message": "Request resolution removed successfully"}
+
+@app.put("/users/me/invite-code")
+async def regenerate_invite_code(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+
+    # Generate a new random invite code
+    new_invite_code = ''.join(choices(string.ascii_letters + string.digits, k=10))
+
+    # Update the user's invite code
+    current_user.invite_code = new_invite_code
+    session.add(current_user)
+    session.commit()
+    session.refresh(current_user)
+
+    return {"message": "Invite code regenerated successfully", "invite_code": new_invite_code}
+
+@app.delete("/leave-property/{property_id}")
+async def leave_property(
+    property_id: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    # Ensure the current user is a tenant
+    if current_user.role != "tenant":
+        raise HTTPException(status_code=403, detail="Only tenants can leave properties")
+
+    # Check if the tenant is associated with the property
+    tenancy_statement = select(Tenancy).where(
+        Tenancy.property_id == property_id,
+        Tenancy.tenant_id == current_user.id
+    )
+    tenancy = session.exec(tenancy_statement).first()
+    if not tenancy:
+        raise HTTPException(status_code=404, detail="You are not associated with this property")
+
+    # Delete the tenancy record
+    session.delete(tenancy)
+    session.commit()
+
+    return {"message": "You have successfully left the property"}
 

@@ -136,7 +136,7 @@ RequestCard.propTypes = {
         request_date: PropTypes.string.isRequired,
     }).isRequired,
     onClick: PropTypes.func,
-    onDelete: PropTypes.func, // Add onDelete prop
+    onDelete: PropTypes.func,
 };
 
 const styles = {
@@ -148,7 +148,7 @@ const styles = {
         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
         cursor: 'default',
         transition: 'background-color 0.3s ease',
-        position: 'relative', // <-- Add this line
+        position: 'relative',
     },
     title: {
         margin: '0 0 8px',

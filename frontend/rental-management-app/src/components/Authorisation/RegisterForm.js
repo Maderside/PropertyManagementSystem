@@ -68,14 +68,33 @@ const RegisterForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateUserName = (name) => {
+    const nameParts = name.split(" ");
+    return (
+      nameParts.length === 2 &&
+      nameParts.every((part) => /^[A-Z][a-z]*$/.test(part))
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate user name format
+    if (!validateUserName(formData.name)) {
+      alert("Field should contain your name and surname, each starting with a capital letter.");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
     try {
-      console.log(formData);
       const response = await axios.post("http://localhost:8000/register", formData);
       alert("Registration successful!");
-      console.log(response.data);
-      
     } catch (error) {
       console.error("Error during registration:", error);
       alert(error.response.data.detail || "Registration failed. Please try again.");

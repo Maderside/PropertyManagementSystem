@@ -8,7 +8,7 @@ const TenantList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showAddTenantForm, setShowAddTenantForm] = useState(false);
-    const [newTenantEmail, setNewTenantEmail] = useState('');
+    const [newTenantInviteCode, setNewTenantInviteCode] = useState(''); // Update state for invite code
 
     const handleTenantClick = (tenant) => {
         // navigate(`/TenantPanel/${tenant.id}`);
@@ -39,20 +39,21 @@ const TenantList = () => {
 
     const handleAddTenant = async () => {
         try {
-            const response = await axios.post(`http://localhost:8000/add-tenant-to-property/${propertyId}/${newTenantEmail}`,{}, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
+            const response = await axios.post(
+                `http://localhost:8000/add-tenant-to-property/${propertyId}/${newTenantInviteCode}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                }
+            );
             alert("New tenant added successfully!");
-            setNewTenantEmail('');
+            setNewTenantInviteCode(''); // Clear the input field
             setShowAddTenantForm(false);
-            console.log(response);
-            setTenants((prevTenants) => [...prevTenants, response.data]); // Update the tenant list with the new tenant
-            // fetchTenants(); // Refresh the tenant list
+            setTenants((prevTenants) => [...prevTenants, response.data]); // Update the tenant list
         } catch (err) {
-            console.log(localStorage.getItem('token'));
-            console.log(err);
+            console.error(err);
             alert(`Error: ${err.response?.data?.detail || err.message}`);
         }
     };
@@ -109,10 +110,10 @@ const TenantList = () => {
             {showAddTenantForm && currentUserRole === "landlord" && (
                 <div style={{ marginTop: '10px' }}>
                     <input
-                        type="email"
-                        placeholder="Enter tenant email"
-                        value={newTenantEmail}
-                        onChange={(e) => setNewTenantEmail(e.target.value)}
+                        type="text"
+                        placeholder="Enter tenant invite code"
+                        value={newTenantInviteCode}
+                        onChange={(e) => setNewTenantInviteCode(e.target.value)}
                         style={{ padding: '5px', marginRight: '10px', width: '250px' }}
                     />
                     <button

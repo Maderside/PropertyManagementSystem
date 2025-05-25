@@ -7,19 +7,20 @@ import AnnouncementsList from './Announcements/AnnouncementsList';
 
 const ManagementTabs = () => {
   const [activeTab, setActiveTab] = useState('Tenants');
+  const [forceListRender, setForceListRender] = useState(false); // State to force re-render of the list
 
   const renderContent = () => {
     switch (activeTab) {
       case 'Tenants':
-        return <TenantList />;
+        return <TenantList key={forceListRender ? 'force-tenants' : 'tenants'} />;
       case 'Responsibilities':
-        return <ResponsibilitiesList />;
+        return <ResponsibilitiesList key={forceListRender ? 'force-responsibilities' : 'responsibilities'} />;
       case 'Payments':
-        return <TransactionsList />;
+        return <TransactionsList key={forceListRender ? 'force-payments' : 'payments'} />;
       case 'Announcements':
-        return <AnnouncementsList />;
+        return <AnnouncementsList key={forceListRender ? 'force-announcements' : 'announcements'} />;
       case 'Tenant requests':
-        return <RequestsList/>; 
+        return <RequestsList key={forceListRender ? 'force-requests' : 'requests'} />;
       default:
         return null;
     }
@@ -60,6 +61,16 @@ const ManagementTabs = () => {
     content: {
       padding: '20px',
     },
+    backButton: {
+      marginTop: '10px',
+      padding: '10px 20px',
+      backgroundColor: '#007BFF',
+      color: '#fff',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      fontWeight: 'bold',
+    },
   };
 
   return (
@@ -72,13 +83,24 @@ const ManagementTabs = () => {
               ...styles.tab,
               ...(activeTab === tab ? styles.activeTab : {}),
             }}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => {
+              setActiveTab(tab);
+              setForceListRender(false); // Reset force render when switching tabs
+            }}
           >
             {tab}
           </div>
         ))}
       </div>
-      <div style={styles.content}>{renderContent()}</div>
+      <div style={styles.content}>
+        {renderContent()}
+        <button
+          style={styles.backButton}
+          onClick={() => setForceListRender((prev) => !prev)} // Toggle force render to re-render the list
+        >
+          ←
+        </button>
+      </div>
     </div>
   );
 };

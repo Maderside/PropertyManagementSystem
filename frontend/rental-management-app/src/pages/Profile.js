@@ -48,6 +48,26 @@ const Profile = () => {
     }
   };
 
+  const regenerateInviteCode = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:8000/users/me/invite-code",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setUser((prevUser) => ({
+        ...prevUser,
+        invite_code: response.data.invite_code,
+      }));
+    } catch (error) {
+      console.error("Error regenerating invite code:", error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove token from localStorage
@@ -69,7 +89,19 @@ const Profile = () => {
         <div>
           <h2>Welcome, {user.email}</h2>
           <p>Role: {user.role}</p>
-          <button onClick={handleLogout} style={buttonStyle}>Logout</button> {/* Logout button */}
+          <p>
+            Invite Code: {user.invite_code || "Not available"}{" "}
+            <button
+              onClick={regenerateInviteCode}
+              style={{ ...buttonStyle, backgroundColor: "green" }}
+              title="Regenerate Invite Code"
+            >
+              ↺
+            </button>
+          </p>
+          <button onClick={handleLogout} style={buttonStyle}>
+            Logout
+          </button>
         </div>
       ) : (
         <div>

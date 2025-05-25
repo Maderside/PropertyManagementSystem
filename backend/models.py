@@ -3,6 +3,7 @@ from sqlmodel import SQLModel, Field
 from sqlalchemy import CheckConstraint
 from typing import Optional
 from decimal import Decimal
+from pydantic import BaseModel
 
 
 # Define the SQLModel for the rental_properties table
@@ -24,6 +25,7 @@ class User(SQLModel, table=True):
     email: str = Field(max_length=255, unique=True, nullable=False)
     hashed_password: str = Field(nullable=False)
     role: str = Field(nullable=False)
+    invite_code: str = Field(max_length=10, unique=True, nullable=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
 class Tenancy(SQLModel, table=True):
@@ -108,3 +110,15 @@ class RequestResolution(SQLModel, table=True):
     user_id: int = Field(foreign_key="users.id", nullable=False)
     status: str = Field(default="pending", nullable=False)
     resolved_at: Optional[datetime] = None
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    role: str
+    invite_code: str | None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
