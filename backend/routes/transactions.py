@@ -26,7 +26,7 @@ async def get_transactions(property_id: int, session: Session = Depends(get_sess
     return transactions
 
 @router.get("/all-resolved-transactions", response_model=List[Transaction])
-async def get_all_transactions(
+async def get_resolved_transactions(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):

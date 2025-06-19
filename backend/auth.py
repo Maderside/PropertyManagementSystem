@@ -1,12 +1,12 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta
 import jwt
-from sqlmodel import Session, create_engine, select
+from sqlmodel import Session, select
 from models import User
-from database import get_session  # Import the session dependency from database.py
+from database import get_session
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
