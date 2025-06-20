@@ -90,14 +90,18 @@ const Profile = () => {
           <h2>Welcome, {user.email}</h2>
           <p>Role: {user.role}</p>
           <p>
-            Invite Code: {user.invite_code || "Not available"}{" "}
-            <button
-              onClick={regenerateInviteCode}
-              style={{ ...buttonStyle, backgroundColor: "green" }}
-              title="Regenerate Invite Code"
-            >
-              ↺
-            </button>
+            {user.role === "tenant" && ( // Render Invite Code section only for tenants
+              <>
+                Invite Code: {user.invite_code || "Not available"}{" "}
+                <button
+                  onClick={regenerateInviteCode}
+                  style={{ ...buttonStyle, backgroundColor: "green" }}
+                  title="Regenerate Invite Code"
+                >
+                  ↺
+                </button>
+              </>
+            )}
           </p>
           <button onClick={handleLogout} style={buttonStyle}>
             Logout
